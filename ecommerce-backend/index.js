@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors(
     {
-        origin: ['http://localhost:5173', 'https://node-feb.onrender.com'], // Frontend URL
+        origin: ['http://localhost:5173', 'https://ecommerce-app-4rhg.onrender.com'], // Frontend URL
         credentials: true
     }
 ));
