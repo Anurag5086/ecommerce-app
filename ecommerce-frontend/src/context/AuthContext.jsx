@@ -11,33 +11,35 @@ import { decodeJwtPayload } from '../utils/jwt'
 
 const AuthContext = createContext(null)
 
-function readHasToken() {
-  return Boolean(localStorage.getItem(TOKEN_KEY))
+function readToken() {
+  return localStorage.getItem(TOKEN_KEY)
 }
 
 export function AuthProvider({ children }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(readHasToken)
+  const [token, setToken] = useState(readToken)
 
-  const signIn = useCallback((token) => {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token)
+  const isAuthenticated = Boolean(token)
+
+  const signIn = useCallback((next) => {
+    if (next) {
+      localStorage.setItem(TOKEN_KEY, next)
+      setToken(next)
     } else {
       localStorage.removeItem(TOKEN_KEY)
+      setToken(null)
     }
-    setIsAuthenticated(Boolean(token))
   }, [])
 
   const signOut = useCallback(() => {
     localStorage.clear()
-    setIsAuthenticated(false)
+    setToken(null)
   }, [])
 
   const isAdmin = useMemo(() => {
-    if (!isAuthenticated) return false
-    const token = localStorage.getItem(TOKEN_KEY)
+    if (!token) return false
     const payload = decodeJwtPayload(token)
     return payload?.isAdmin === true
-  }, [isAuthenticated])
+  }, [token])
 
   const value = useMemo(
     () => ({ isAuthenticated, isAdmin, signIn, signOut }),
