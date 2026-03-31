@@ -1,0 +1,129 @@
+.admin-orders {
+  max-width: 100%;
+}
+
+.admin-orders-header {
+  margin-bottom: 20px;
+}
+
+.admin-orders-title {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+}
+
+.admin-orders-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.admin-orders-error {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--text-h);
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .admin-orders-error {
+    background: rgba(248, 113, 113, 0.12);
+  }
+}
+
+.admin-orders-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.admin-orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  text-align: left;
+}
+
+.admin-orders-table th,
+.admin-orders-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.admin-orders-table th {
+  font-weight: 600;
+  color: var(--text-h);
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+.admin-orders-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-orders-table tbody tr:hover td {
+  background: var(--accent-bg);
+}
+
+.admin-orders-id {
+  font-size: 0.85em;
+  color: var(--text-h);
+}
+
+.admin-orders-items {
+  max-width: 280px;
+  word-break: break-word;
+}
+
+.admin-orders-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+.admin-orders-muted {
+  color: var(--text);
+  text-align: center;
+  padding: 28px 16px !important;
+}
+
+.admin-orders-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.admin-orders-page-btn {
+  font: inherit;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.admin-orders-page-btn:hover:not(:disabled) {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.admin-orders-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-orders-page-info {
+  font-size: 0.95rem;
+  color: var(--text);
+}

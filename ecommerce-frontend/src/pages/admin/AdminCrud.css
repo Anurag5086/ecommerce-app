@@ -1,0 +1,252 @@
+.admin-crud {
+  max-width: 100%;
+}
+
+.admin-crud-header {
+  margin-bottom: 20px;
+}
+
+.admin-crud-title {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+}
+
+.admin-crud-subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.admin-crud-error {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--text-h);
+  margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .admin-crud-error {
+    background: rgba(248, 113, 113, 0.12);
+  }
+}
+
+.admin-crud-form-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: var(--code-bg);
+  text-align: left;
+}
+
+.admin-crud-form-title {
+  margin: 0 0 16px;
+  font-size: 1.05rem;
+  color: var(--text-h);
+}
+
+.admin-crud-fields {
+  display: grid;
+  gap: 14px;
+}
+
+@media (min-width: 640px) {
+  .admin-crud-fields--two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.admin-crud-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-crud-field label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.admin-crud-field input[type='text'],
+.admin-crud-field input[type='number'],
+.admin-crud-field input[type='email'],
+.admin-crud-field select,
+.admin-crud-field textarea {
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  box-sizing: border-box;
+}
+
+.admin-crud-field textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.admin-crud-field textarea.admin-crud-textarea--images {
+  min-height: 72px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.admin-crud-field--checkbox-row {
+  justify-content: flex-end;
+  padding-top: 26px;
+}
+
+.admin-crud-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--text-h);
+}
+
+.admin-crud-check input {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-crud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-crud-btn {
+  font: inherit;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.admin-crud-btn:hover:not(:disabled) {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.admin-crud-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-crud-btn-primary {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+  font-weight: 500;
+}
+
+.admin-crud-btn-danger {
+  border-color: rgba(220, 38, 38, 0.45);
+  color: #b91c1c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .admin-crud-btn-danger {
+    color: #fca5a5;
+    border-color: rgba(248, 113, 113, 0.4);
+  }
+}
+
+.admin-crud-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+}
+
+.admin-crud-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  text-align: left;
+}
+
+.admin-crud-table th,
+.admin-crud-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.admin-crud-table th {
+  font-weight: 600;
+  color: var(--text-h);
+  background: var(--code-bg);
+  white-space: nowrap;
+}
+
+.admin-crud-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-crud-table tbody tr:hover td {
+  background: var(--accent-bg);
+}
+
+.admin-crud-muted {
+  color: var(--text);
+  text-align: center;
+  padding: 28px 16px !important;
+}
+
+.admin-crud-actions-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-crud-actions-cell .admin-crud-btn {
+  padding: 6px 12px;
+  font-size: 0.88rem;
+}
+
+.admin-crud-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 500;
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+.admin-crud-filter {
+  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-crud-filter label {
+  font-size: 0.9rem;
+  color: var(--text-h);
+}
+
+.admin-crud-filter select {
+  font: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  min-width: 200px;
+}
+
+.admin-crud-desc-cell {
+  max-width: 280px;
+  word-break: break-word;
+}
