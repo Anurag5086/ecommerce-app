@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const fs = require('fs');
 require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
@@ -29,16 +30,28 @@ app.use('/api/orders', orderRoutes);
 
 // In production, serve frontend build and return index.html for any non-API route
 if (process.env.NODE_ENV === 'production') {
-    const clientBuildPath = path.join(__dirname, '..', 'ecommerce-frontend', 'dist');
-    app.use(express.static(clientBuildPath));
+    const possibleBuildPaths = [
+        path.join(__dirname, '..', 'ecommerce-frontend', 'dist'),
+        path.join(process.cwd(), '..', 'ecommerce-frontend', 'dist'),
+        path.join(process.cwd(), 'ecommerce-frontend', 'dist'),
+        path.join(process.cwd(), 'dist')
+    ];
 
-    // Catch-all middleware: send index.html so React Router can handle client-side routing
-    // Use a middleware instead of a route pattern to avoid path-to-regexp parsing issues
-    app.use((req, res, next) => {
-        // If request starts with /api, pass through to API routes
-        if (req.path.startsWith('/api')) return next();
-        res.sendFile(path.join(clientBuildPath, 'index.html'));
-    });
+    const clientBuildPath = possibleBuildPaths.find((p) =>
+        fs.existsSync(path.join(p, 'index.html'))
+    );
+
+    if (clientBuildPath) {
+        app.use(express.static(clientBuildPath));
+
+        // Catch-all middleware: send index.html so React Router can handle client-side routing
+        app.use((req, res, next) => {
+            if (req.path.startsWith('/api')) return next();
+            res.sendFile(path.join(clientBuildPath, 'index.html'));
+        });
+    } else {
+        console.warn('Frontend dist not found; API routes only in this deployment.');
+    }
 }
 
 app.listen(3000, () => {
