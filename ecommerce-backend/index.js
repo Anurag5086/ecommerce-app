@@ -29,7 +29,7 @@ app.use('/api/orders', orderRoutes);
 
 // In production, serve frontend build and return index.html for any non-API route
 if (process.env.NODE_ENV === 'production') {
-    const clientBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
+    const clientBuildPath = path.join(__dirname, '..', 'ecommerce-frontend', 'dist');
     app.use(express.static(clientBuildPath));
 
     // Catch-all middleware: send index.html so React Router can handle client-side routing
