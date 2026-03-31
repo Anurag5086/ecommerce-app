@@ -30,6 +30,10 @@ exports.getCategory = async (req, res, next) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
+        if (!category.isActive && !req.user?.isAdmin) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
         res.status(200).json({ category });
     }catch(err){
         next(err);
@@ -38,11 +42,11 @@ exports.getCategory = async (req, res, next) => {
 
 exports.getAllCategories = async (req, res, next) => {
     try{
-        const categories = await Category.find();
-
-        if(categories.length === 0){
-            return res.status(404).json({ message: 'No categories found' });
+        const filter = {};
+        if (!req.user?.isAdmin) {
+            filter.isActive = true;
         }
+        const categories = await Category.find(filter);
         res.status(200).json({ categories });
     }catch(err){
         next(err);

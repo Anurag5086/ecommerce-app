@@ -22,27 +22,24 @@ function requireToken() {
   return token
 }
 
+function optionalAuthHeaders() {
+  const token = getAuthToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 /**
  * @param {{ categoryId?: string }} [params]
  */
 export async function fetchProducts(params = {}) {
-  const token = requireToken()
   const search = new URLSearchParams()
   if (params.categoryId) search.set('categoryId', params.categoryId)
   const qs = search.toString()
   const url = `${getProductsBase()}/list${qs ? `?${qs}` : ''}`
   const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { ...optionalAuthHeaders() },
   })
   const data = await parseJson(res)
   if (!res.ok) {
-    if (
-      res.status === 404 &&
-      typeof data.message === 'string' &&
-      data.message.toLowerCase().includes('no product')
-    ) {
-      return []
-    }
     throw new Error(data.message || 'Failed to load products')
   }
   return Array.isArray(data.products) ? data.products : []
@@ -52,9 +49,8 @@ export async function fetchProducts(params = {}) {
  * @param {string} id
  */
 export async function fetchProductById(id) {
-  const token = requireToken()
   const res = await fetch(`${getProductsBase()}/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { ...optionalAuthHeaders() },
   })
   const data = await parseJson(res)
   if (!res.ok) {

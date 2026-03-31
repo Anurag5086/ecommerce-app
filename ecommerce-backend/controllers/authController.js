@@ -94,3 +94,44 @@ exports.googleLogin = async (req, res, next) => {
         next(err);
     }
 };
+
+exports.getProfile = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ user });
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.updateProfile = async (req, res, next) => {
+    try {
+        const { name, email, contactNumber, address } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (email && email !== user.email) {
+            const existing = await User.findOne({ email: String(email).trim().toLowerCase() });
+            if (existing && String(existing._id) !== String(user._id)) {
+                return res.status(400).json({ message: 'Email already in use' });
+            }
+            user.email = String(email).trim().toLowerCase();
+        }
+
+        if (typeof name === 'string') user.name = name.trim();
+        if (typeof contactNumber === 'string') user.contactNumber = contactNumber.trim();
+        if (typeof address === 'string') user.address = address.trim();
+
+        await user.save();
+        const safeUser = user.toObject();
+        delete safeUser.password;
+        res.status(200).json({ message: 'Profile updated successfully', user: safeUser });
+    } catch (err) {
+        next(err);
+    }
+};

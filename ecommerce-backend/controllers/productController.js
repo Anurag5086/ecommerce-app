@@ -30,6 +30,10 @@ exports.getProduct = async (req, res, next) => {
             return res.status(404).json({ message: 'Product not found' });
         }
 
+        if (!product.isActive && !req.user?.isAdmin) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
         res.status(200).json({ product });
     }catch(err){
         next(err);
@@ -42,12 +46,11 @@ exports.getAllProducts = async (req, res, next) => {
         if(req.query.categoryId){
             filter.categoryId = req.query.categoryId;
         }
+        if (!req.user?.isAdmin) {
+            filter.isActive = true;
+        }
 
         const products = await Product.find(filter);
-
-        if(products.length === 0){
-            return res.status(404).json({ message: 'No products found' });
-        }
         res.status(200).json({ products });
     }catch(err){
         next(err);

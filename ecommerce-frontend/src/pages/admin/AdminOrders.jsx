@@ -1,6 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchAdminOrders } from '../../api/orders'
+import { Link } from 'react-router-dom'
+import { fetchAdminOrders, updateOrderStatus } from '../../api/orders'
 import './AdminOrders.css'
+
+const ORDER_STATUSES = [
+  'Pending',
+  'Processing',
+  'Shipped',
+  'Delivered',
+  'Cancelled',
+]
 
 function formatMoney(n) {
   if (typeof n !== 'number' || Number.isNaN(n)) return '—'
@@ -30,7 +39,8 @@ function summarizeItems(products) {
     const qty = line.quantity ?? 0
     return `${title} × ${qty}`
   })
-  return parts.join(', ')
+  if (parts.length <= 2) return parts.join(', ')
+  return `${parts.slice(0, 2).join(', ')} +${parts.length - 2} more`
 }
 
 export default function AdminOrders() {
@@ -39,13 +49,21 @@ export default function AdminOrders() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [pendingStatusById, setPendingStatusById] = useState({})
+  const [savingById, setSavingById] = useState({})
 
   const load = useCallback(async (p) => {
     setError('')
     setLoading(true)
     try {
       const data = await fetchAdminOrders({ page: p, limit: 20 })
-      setOrders(Array.isArray(data.orders) ? data.orders : [])
+      const nextOrders = Array.isArray(data.orders) ? data.orders : []
+      setOrders(nextOrders)
+      setPendingStatusById(
+        Object.fromEntries(
+          nextOrders.map((order) => [order._id, order.status ?? 'Pending']),
+        ),
+      )
       setTotalPages(
         typeof data.totalPages === 'number' && data.totalPages > 0
           ? data.totalPages
@@ -62,6 +80,29 @@ export default function AdminOrders() {
   useEffect(() => {
     load(page)
   }, [page, load])
+
+  async function handleUpdateStatus(orderId) {
+    const status = pendingStatusById[orderId]
+    if (!status) return
+    setSavingById((prev) => ({ ...prev, [orderId]: true }))
+    setError('')
+    try {
+      const updated = await updateOrderStatus(orderId, status)
+      setOrders((prev) =>
+        prev.map((order) => (order._id === orderId ? { ...order, ...updated } : order)),
+      )
+      setPendingStatusById((prev) => ({
+        ...prev,
+        [orderId]: updated.status ?? status,
+      }))
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Failed to update order status',
+      )
+    } finally {
+      setSavingById((prev) => ({ ...prev, [orderId]: false }))
+    }
+  }
 
   return (
     <div className="admin-orders">
@@ -87,6 +128,7 @@ export default function AdminOrders() {
               <th scope="col">Items</th>
               <th scope="col">Total</th>
               <th scope="col">Status</th>
+              <th scope="col">Update Status</th>
               <th scope="col">Payment</th>
               <th scope="col">Placed</th>
             </tr>
@@ -94,13 +136,13 @@ export default function AdminOrders() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={7} className="admin-orders-muted">
+                <td colSpan={8} className="admin-orders-muted">
                   Loading…
                 </td>
               </tr>
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={7} className="admin-orders-muted">
+                <td colSpan={8} className="admin-orders-muted">
                   No orders yet.
                 </td>
               </tr>
@@ -109,22 +151,62 @@ export default function AdminOrders() {
                 const user = order.userId
                 const customer =
                   user && typeof user === 'object'
-                    ? [user.name, user.email].filter(Boolean).join(' · ')
+                    ? [user.name, user.email, user.contactNumber, user.address]
+                        .filter(Boolean)
+                        .join(' · ')
                     : null
+                const itemsSummary = summarizeItems(order.products)
                 return (
                   <tr key={order._id}>
                     <td>
-                      <code className="admin-orders-id">
-                        {String(order._id).slice(-8)}
-                      </code>
+                      <Link
+                        to={`/admin/orders/${order._id}`}
+                        className="admin-orders-id-link"
+                      >
+                        <code className="admin-orders-id">
+                          {String(order._id).slice(-8)}
+                        </code>
+                      </Link>
                     </td>
                     <td>{customer || '—'}</td>
-                    <td className="admin-orders-items">
-                      {summarizeItems(order.products)}
+                    <td className="admin-orders-items" title={itemsSummary}>
+                      {itemsSummary}
                     </td>
                     <td>{formatMoney(order.totalAmount)}</td>
                     <td>
                       <span className="admin-orders-status">{order.status}</span>
+                    </td>
+                    <td>
+                      <div className="admin-orders-status-edit">
+                        <select
+                          className="admin-orders-status-select"
+                          value={pendingStatusById[order._id] ?? order.status ?? 'Pending'}
+                          onChange={(e) =>
+                            setPendingStatusById((prev) => ({
+                              ...prev,
+                              [order._id]: e.target.value,
+                            }))
+                          }
+                          disabled={Boolean(savingById[order._id])}
+                        >
+                          {ORDER_STATUSES.map((s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="admin-orders-update-btn"
+                          disabled={
+                            Boolean(savingById[order._id]) ||
+                            (pendingStatusById[order._id] ?? order.status) === order.status
+                          }
+                          onClick={() => handleUpdateStatus(order._id)}
+                        >
+                          {savingById[order._id] ? 'Saving…' : 'Update'}
+                        </button>
+                      </div>
                     </td>
                     <td>{order.paymentMethod ?? '—'}</td>
                     <td>{formatDate(order.createdAt)}</td>

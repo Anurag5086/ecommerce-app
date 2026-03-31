@@ -22,20 +22,17 @@ function requireToken() {
   return token
 }
 
+function optionalAuthHeaders() {
+  const token = getAuthToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 export async function fetchCategories() {
-  const token = requireToken()
   const res = await fetch(`${getCategoriesBase()}/list`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { ...optionalAuthHeaders() },
   })
   const data = await parseJson(res)
   if (!res.ok) {
-    if (
-      res.status === 404 &&
-      typeof data.message === 'string' &&
-      data.message.toLowerCase().includes('no categor')
-    ) {
-      return []
-    }
     throw new Error(data.message || 'Failed to load categories')
   }
   return Array.isArray(data.categories) ? data.categories : []
@@ -45,9 +42,8 @@ export async function fetchCategories() {
  * @param {string} id
  */
 export async function fetchCategoryById(id) {
-  const token = requireToken()
   const res = await fetch(`${getCategoriesBase()}/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { ...optionalAuthHeaders() },
   })
   const data = await parseJson(res)
   if (!res.ok) {

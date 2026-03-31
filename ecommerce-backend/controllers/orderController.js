@@ -26,8 +26,14 @@ exports.createOrder = async (req, res) => {
 // Get order by ID
 exports.getOrderById = async (req, res) => {
     try {
-        const order = await Order.findById(req.params.id).populate('products.productId');
+        const order = await Order.findById(req.params.id)
+            .populate('products.productId')
+            .populate('userId', 'name email contactNumber address');
         if (!order) return res.status(404).json({ message: 'Order not found' });
+
+        if (!req.user.isAdmin && String(order.userId?._id || order.userId) !== String(req.user.id)) {
+            return res.status(403).json({ message: 'Not allowed to view this order' });
+        }
         res.json(order);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
@@ -47,6 +53,15 @@ exports.getAllOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const allowedStatus = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+        if (!req.user.isAdmin) {
+            return res.status(403).json({ message: 'Only admins can update order status' });
+        }
+        if (!allowedStatus.includes(status)) {
+            return res.status(400).json({ message: 'Invalid status value' });
+        }
+
         const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
         if (!order) return res.status(404).json({ message: 'Order not found' });
         res.json(order);
@@ -69,7 +84,7 @@ exports.getAllOrdersForAdmin = async (req, res) => {
 
         const orders = await Order.find()
             .populate('products.productId', 'title')
-            .populate('userId', 'name email')
+            .populate('userId', 'name email contactNumber address')
             .skip(skipValue)
             .limit(limit)
             .sort({ createdAt: -1 });
